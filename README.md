@@ -20,7 +20,7 @@
 把本仓库放到你所用 agent 的 skill 目录（软链或拷贝均可）：
 
 ```bash
-git clone https://github.com/<you>/resume-builder.git
+git clone https://github.com/kuangxiaoc/resume-builder.git
 
 # Claude Code
 ln -s "$PWD/resume-builder" ~/.claude/skills/resume-builder
