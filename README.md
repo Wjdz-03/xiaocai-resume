@@ -10,10 +10,27 @@
 - **自由度与可靠性分层**：agent 负责"判断"（分析 JD、裁剪、改写），脚本负责"不许出错"（建目录、编译、校验页数）。不该自由发挥的全被脚本焊死。
 - **skill 本体与用户数据分离**：本仓库只含契约 / 模板 / 脚本 / 文档，**绝不含真实个人信息**；你的素材库和简历产物在你自己的工作目录生成，不进本仓库。
 
-## 依赖
+## 编译环境（最小依赖）
 
-- `xelatex`（TeX Live）。macOS：`brew install mactex`；Ubuntu：`sudo apt install texlive-xetex texlive-lang-chinese`。
-- 可选：`pyyaml`（仅用于 `check_profile.py` 结构校验；未装会自动跳过，不影响主流程）。
+编译需要三样，缺一不可：
+
+1. **xelatex 引擎**（TeX Live）
+2. **中文宏包** `ctex` / `xeCJK` / `xeCJKfntef` / `zhnumber` —— **basic / minimal 版 TeX Live 默认没有**，这是新用户最常卡住的地方
+3. **中文字体**：macOS 自带 `PingFang SC`；Linux 需 `fonts-noto-cjk`（并把 skeleton 字体改为 Noto Sans CJK SC）
+
+**先自检，再编译**：
+
+```bash
+bash scripts/check_env.sh
+```
+
+它逐项检测，环境不全时退出码非 0，并打印你平台的**最小安装命令**。常见安装：
+
+- macOS 未装任何 TeX Live：`brew install --cask mactex`（完整版，含中文宏包）
+- macOS 已装 basic/minimal，只补中文宏包：`sudo tlmgr install collection-langchinese`
+- Ubuntu/Debian：`sudo apt install texlive-xetex texlive-lang-chinese texlive-fonts-extra fonts-noto-cjk`
+
+可选：`pyyaml`（仅用于 `check_profile.py` 结构校验；未装会自动跳过，不影响主流程）。
 
 ## 安装
 
@@ -63,9 +80,10 @@ resume-builder/
 │   ├── skeleton.tex           # 简历骨架范本
 │   └── example.profile.yaml   # 示例素材库（虚构，教学用）
 └── scripts/                   # 确定性原语（agent 只调用）
+    ├── check_env.sh           # 体检最小编译环境（引擎/中文宏包/字体），给安装命令
     ├── new_output.sh          # 建 output/<user>-<slug>-<日期>/
     ├── check_profile.py       # 校验 profile.yaml（可选，需 pyyaml）
-    ├── build.sh               # 编译（系统 xelatex ×2）
+    ├── build.sh               # 编译（系统 xelatex ×2，先查引擎+中文宏包）
     └── validate.sh            # 校验 PDF（页数 / 字体）
 ```
 

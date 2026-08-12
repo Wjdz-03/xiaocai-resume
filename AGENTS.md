@@ -36,15 +36,16 @@ agent 在**用户的当前工作目录**下读写 `profiles/` 与 `output/`，**
 4. 可选校验：`python3 <skill>/scripts/check_profile.py profiles/<user>/profile.yaml`（需 pyyaml，未装会自动跳过）。
 
 ### 生成简历
-1. 询问目标岗位：JD 文本或 URL。URL 且能联网则抓取，不能则请用户粘贴。
-2. 读 `profiles/<user>/profile.yaml`，分析 JD（岗位名、技术关键词、偏好经历类型、公司名）。
-3. 从素材库**筛选**与 JD 相关的条目，最相关排前；按 JD 关键词**改写** bullet 措辞；重写标题行（替换 skeleton 中的 `<POSITION_LINE>` 为目标岗位名）。**只改写，不编造**。
-4. 建输出目录：`bash <skill>/scripts/new_output.sh <user> <slug>`（slug 如 `ai-quality`），记下返回的目录路径。
-5. 参照 `templates/skeleton.tex` 与 `contracts/latex-rules.md`，把筛选改写后的内容**手写**成 `output/.../resume.tex`。
-6. 编译：`bash <skill>/scripts/build.sh output/.../resume.tex`
-7. 校验：`bash <skill>/scripts/validate.sh output/.../resume.pdf`
-8. 若 build / validate 任一脚本失败（退出码非 0），按报错修复 `resume.tex` 后重跑，**不要跳过**。
-9. 交付：告知用户 PDF 路径。可顺带一句"需要这份 JD 的匹配分析可以告诉我"。
+1. **环境自检**：`bash <skill>/scripts/check_env.sh`。若失败（退出码非 0），按输出的平台指引安装最小编译包（agent 可执行 `brew` / `tlmgr` / `apt`；系统级操作先告知用户再执行），装完重跑确认环境完整，再继续。
+2. 询问目标岗位：JD 文本或 URL。URL 且能联网则抓取，不能则请用户粘贴。
+3. 读 `profiles/<user>/profile.yaml`，分析 JD（岗位名、技术关键词、偏好经历类型、公司名）。
+4. 从素材库**筛选**与 JD 相关的条目，最相关排前；按 JD 关键词**改写** bullet 措辞；重写标题行（替换 skeleton 中的 `<POSITION_LINE>` 为目标岗位名）。**只改写，不编造**。
+5. 建输出目录：`bash <skill>/scripts/new_output.sh <user> <slug>`（slug 如 `ai-quality`），记下返回的目录路径。
+6. 参照 `templates/skeleton.tex` 与 `contracts/latex-rules.md`，把筛选改写后的内容**手写**成 `output/.../resume.tex`。
+7. 编译：`bash <skill>/scripts/build.sh output/.../resume.tex`（脚本内部会先查 xelatex 引擎与中文宏包）。
+8. 校验：`bash <skill>/scripts/validate.sh output/.../resume.pdf`
+9. 若 check_env / build / validate 任一脚本失败（退出码非 0），按报错修复后重跑，**不要跳过**。
+10. 交付：告知用户 PDF 路径。可顺带一句"需要这份 JD 的匹配分析可以告诉我"。
 
 ## 匹配分析（可选，不主动做）
 默认**不产出**。仅当用户主动询问，或你交付时顺带提供时，输出三段：**命中 / 不足 / 建议**。
@@ -61,9 +62,10 @@ agent 在**用户的当前工作目录**下读写 `profiles/` 与 `output/`，**
 
 | 脚本 | 用法 |
 |------|------|
+| 环境自检 | `bash <skill>/scripts/check_env.sh`（缺啥给啥安装命令） |
 | 建输出目录 | `bash <skill>/scripts/new_output.sh <user> <slug>` |
 | 校验素材（可选） | `python3 <skill>/scripts/check_profile.py <profile.yaml>` |
 | 编译 | `bash <skill>/scripts/build.sh <resume.tex>` |
 | 校验产物 | `bash <skill>/scripts/validate.sh <resume.pdf>` |
 
-依赖：系统需安装 `xelatex`（TeX Live；macOS `brew install mactex`）。`check_profile.py` 可选依赖 `pyyaml`。
+依赖（最小编译环境）：`xelatex` 引擎 + 中文宏包 `ctex`/`xeCJK`/`xeCJKfntef`/`zhnumber` + 中文字体。详见 `check_env.sh` 与 README「编译环境」。`check_profile.py` 可选依赖 `pyyaml`。

@@ -26,7 +26,13 @@ fi
 cp "$TEMPLATES/resume.cls" "$DIR/"
 
 if ! command -v xelatex >/dev/null 2>&1; then
-  echo "❌ 未检测到 xelatex。请先安装 TeX Live（macOS: brew install mactex）" >&2
+  echo "❌ 未检测到 xelatex 引擎。运行 scripts/check_env.sh 查看安装指引" >&2
+  exit 1
+fi
+
+# 中文宏包检测（basic/minimal 版 TeX Live 常缺，否则会报晦涩的 File 'ctexart.cls' not found）
+if ! kpsewhich ctexart.cls >/dev/null 2>&1; then
+  echo "❌ 缺少中文宏包 ctex（ctexart.cls）。运行 scripts/check_env.sh 查看完整环境与安装指引" >&2
   exit 1
 fi
 
