@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Resume Profile",
+  "description": "profile.yaml 的结构定义。agent 首次引导用户填写时，以及每次生成前自检时，都应符合此结构（可选机检见 scripts/check_profile.py）。",
+  "type": "object",
+  "required": ["meta", "education", "experience", "projects", "skills"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["name", "phone", "email", "city"],
+      "properties": {
+        "name": { "type": "string", "description": "姓名" },
+        "phone": { "type": "string", "description": "手机号，建议字符串避免被科学计数" },
+        "email": { "type": "string", "description": "邮箱" },
+        "city": { "type": "string", "description": "所在城市" },
+        "age": { "type": "number" },
+        "gender": { "type": "string" },
+        "github": { "type": "string", "description": "GitHub 主页 URL" },
+        "photo": { "type": "string", "description": "证件照文件名，位于 profiles/<user>/ 下" },
+        "availability": { "type": "string", "description": "到岗时间，如 月内到岗" }
+      },
+      "additionalProperties": true
+    },
+    "education": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["school", "degree", "period"],
+        "properties": {
+          "school": { "type": "string" },
+          "degree": { "type": "string", "description": "本科/研究生 等" },
+          "major": { "type": "string" },
+          "college": { "type": "string" },
+          "period": { "type": "string", "description": "起止，如 2022.09—2026.06" },
+          "courses": { "type": "array", "items": { "type": "string" } },
+          "awards": { "type": "array", "items": { "type": "string" } },
+          "direction": { "type": "string", "description": "研究方向" },
+          "tags": { "type": "array", "items": { "type": "string" }, "description": "用于按 JD 精选，如 undergrad/grad/llm" }
+        }
+      }
+    },
+    "experience": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["org", "role", "period", "bullets"],
+        "properties": {
+          "id": { "type": "string" },
+          "org": { "type": "string", "description": "公司/组织名" },
+          "role": { "type": "string" },
+          "period": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "bullets": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "object",
+                  "required": ["text"],
+                  "properties": {
+                    "text": { "type": "string" },
+                    "tags": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "period", "bullets"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "period": { "type": "string" },
+          "summary": { "type": "string" },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "bullets": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "object",
+                  "required": ["text"],
+                  "properties": {
+                    "text": { "type": "string" },
+                    "tags": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["category", "items"],
+        "properties": {
+          "category": { "type": "string" },
+          "items": { "type": "array", "items": { "type": "string" } },
+          "tags": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "awards": { "type": "array", "items": { "type": "string" } },
+    "open_source": { "type": "array" }
+  }
+}

@@ -1,0 +1,13 @@
+# 用户数据：个人素材库与简历产物绝不进仓库
+profiles/
+output/
+
+# LaTeX 编译中间产物
+*.aux
+*.log
+*.out
+*.pdf
+*.synctex.gz
+
+# 系统
+.DS_Store

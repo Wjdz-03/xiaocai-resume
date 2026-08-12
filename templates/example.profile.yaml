@@ -1,0 +1,75 @@
+# 示例素材库（虚构人物，仅用于教学，非真实信息）
+# agent 引导新用户建立 profiles/<user>/profile.yaml 时，可参照此结构。
+# 详细字段定义见 contracts/profile.schema.json
+
+meta:
+  name: 张明
+  phone: "13800000000"
+  email: zhangming@example.com
+  city: 杭州
+  age: 23
+  gender: 男
+  github: https://github.com/zhangming
+  photo: photo.jpg
+  availability: 月内到岗
+
+education:
+  - school: 某理工大学
+    degree: 本科
+    major: 软件工程
+    college: 计算机科学与技术学院
+    period: 2021.09—2025.06
+    courses: [数据结构, 算法设计, 操作系统, 数据库系统, 机器学习]
+    awards: [校级一等奖学金, 数学建模省赛二等奖]
+    tags: [undergrad]
+  - school: 某师范大学
+    degree: 研究生（已录取）
+    major: 计算机技术
+    college: 计算机科学与技术学院
+    period: 2025.09—2028.06
+    direction: 自然语言处理与大模型应用
+    tags: [grad, llm, nlp]
+
+experience:
+  - id: acme-intern
+    org: 某科技有限公司
+    role: 后端开发实习生
+    period: 2024.06—2024.12
+    tags: [backend, python, fastapi, llm]
+    bullets:
+      - text: 参与内部知识库问答系统开发，基于 RAG 架构接入大模型，支持文档检索与生成
+        tags: [rag, llm, retrieval]
+      - text: 使用 FastAPI 重构接口层，P99 延迟下降约 30%
+        tags: [fastapi, backend, performance]
+      - text: 编写单元测试与接口文档，覆盖核心服务
+        tags: [testing, docs]
+
+projects:
+  - id: doc-qa
+    name: 文档智能问答工具
+    period: "2024.03"
+    summary: 基于 LangChain 的本地文档问答小工具
+    tags: [langchain, rag, llm, python]
+    bullets:
+      - text: 支持 PDF/Markdown 切片、向量检索与多轮对话
+        tags: [rag, vector]
+      - text: 提供 CLI 与简易 Web 界面
+        tags: [cli, web]
+  - id: transformer-toy
+    name: 迷你 Transformer 实现
+    period: "2023.11"
+    tags: [pytorch, transformer, nlp]
+    bullets:
+      - text: 从零实现注意力机制与前向/反向，复现小规模翻译效果
+        tags: [deep-learning]
+
+skills:
+  - category: 语言与框架
+    items: [Python, FastAPI, PyTorch, LangChain, SQL, Git]
+    tags: [backend, llm]
+  - category: 方向
+    items: [RAG 应用, 大模型微调, 后端工程]
+    tags: [llm, backend]
+
+awards: [校级一等奖学金, 数学建模省赛二等奖]
+open_source: []

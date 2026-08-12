@@ -1,0 +1,70 @@
+% !TeX TS-program = xelatex
+% 简历 tex 骨架 —— agent 据此手写，勿自由创造结构
+% 编译：bash <skill>/scripts/build.sh path/to/resume.tex
+% 规范：contracts/latex-rules.md
+\documentclass{resume}
+\ResumeName{<姓名>}
+
+\usepackage{graphicx}
+% 字体：macOS 用 PingFang SC；其他系统替换为可用中文字体
+\setCJKmainfont{PingFang SC}
+\setCJKsansfont{PingFang SC}
+\setCJKfamilyfont{hei}[BoldFont=PingFang SC Semibold]{PingFang SC Medium}
+\newcommand{\heiti}{\CJKfamily{hei}}
+
+% 标题区（含照片）。照片路径相对本 tex，指向 profiles/<user>/photo.jpg
+\newcommand{\PhotoResumeTitle}{
+  \noindent
+  \begin{minipage}[c]{0.80\textwidth}
+    \begin{center}
+      {\zihao{-2}\heiti <姓名>}\\[-0.2em]
+      <电话>~|~
+      \ResumeUrl{mailto:<邮箱>}{<邮箱>}~|~
+      <城市>~|~<年龄> 岁~|~<性别}\\
+      <POSITION_LINE>~|~<到岗时间>~|~
+      \ResumeUrl{<github url>}{github.com/...}
+    \end{center}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[c]{0.14\textwidth}
+    \centering
+    \includegraphics[width=2.0cm]{../../profiles/<user>/photo.jpg}
+  \end{minipage}
+  \vspace{0.2em}
+}
+
+\begin{document}
+
+\PhotoResumeTitle
+
+% ========== 教育经历 ==========
+\section{教育经历}
+\ResumeItem[学校名|学历]{学校名}[\textnormal{专业，学院\textbar} 学历][起止]
+主修课程：...
+\GrayText{奖项：...}
+
+% ========== 实习/工作经历 ==========
+\section{实习经历}
+\ResumeItem{公司名}[\textnormal{岗位\textbar} 其他信息][起止]
+\begin{itemize}
+  \item 经历要点 1（按 JD 改写，突出现相关键词，不编造）
+  \item 经历要点 2
+\end{itemize}
+
+% ========== 项目经历 ==========
+\section{项目经历}
+\ResumeItem{项目名}[角色/技术][起止]
+\begin{itemize}
+  \item 项目要点（最相关排前）
+  \item ...
+\end{itemize}
+
+% ========== 技能 ==========
+\section{技能}
+\ResumeItem{分类}{技能项列表}
+
+% ========== 获奖（可选） ==========
+\section{获奖}
+\GrayText{...}
+
+\end{document}
