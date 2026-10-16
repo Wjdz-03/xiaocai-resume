@@ -1,14 +1,25 @@
 # 手写 LaTeX 规范
 
 agent 直接编写 `resume.tex`，不借助程序渲染，因此必须严格遵守本规范以保证
-`xelatex` 通过、且排版正确。`validate.sh` 只提供编译产物的基础辅助检查；
+`xelatex` 通过、且排版正确。`node scripts/resume.mjs validate` 只提供编译产物的基础辅助检查；
 编译后仍需由 Agent 检查内容、事实边界和页面视觉效果。若脚本报错，按日志修复
 后重编译，**不要跳过任何报错**。
 
 ## 1. 文档类与模板
 
 - 文档类固定：`\documentclass{resume}`，**不要修改 `templates/resume.cls`**。
-- 中文字体：macOS 用 `\setCJKmainfont{PingFang SC}`；其他系统替换为可用的中文字体（如 Windows 的 `SimSun`/`Microsoft YaHei`，Linux 的 `Noto Sans CJK SC`）。
+- 中文字体按平台选择（`node scripts/resume.mjs check-env` 会打印当前平台推荐字体名）：
+
+  | 平台 | 中文字体 | 写法 |
+  |------|----------|------|
+  | macOS | `PingFang SC` | `\setCJKmainfont{PingFang SC}` |
+  | Windows | `Microsoft YaHei` | `\setCJKmainfont{Microsoft YaHei}` |
+  | Linux | `Noto Sans CJK SC` | `\setCJKmainfont{Noto Sans CJK SC}` |
+
+  > Windows 注：部分 TeX Live 环境下 fontspec 按显示名 `Microsoft YaHei`
+  > 找不到字体（报 "The font cannot be found"）。此时改用字体文件名：
+  > `\setCJKmainfont{msyh.ttc}`（黑体为 `msyhbd.ttc`），或
+  > `\setCJKmainfont{SimSun}` / `\setCJKmainfont{simsun.ttc}`。
 
 ## 2. 照片路径
 

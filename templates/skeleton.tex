@@ -1,12 +1,12 @@
 % !TeX TS-program = xelatex
 % 简历 tex 骨架 —— agent 据此手写，勿自由创造结构
-% 编译：bash <skill>/scripts/build.sh path/to/resume.tex
+% 编译：node <skill>/scripts/resume.mjs build path/to/resume.tex
 % 规范：contracts/latex-rules.md
 \documentclass{resume}
 \ResumeName{<姓名>}
 
 \usepackage{graphicx}
-% 字体：macOS 用 PingFang SC；其他系统替换为可用中文字体
+% 字体按平台选择：macOS 用 PingFang SC；Windows 用 Microsoft YaHei；Linux 用 Noto Sans CJK SC
 \setCJKmainfont{PingFang SC}
 \setCJKsansfont{PingFang SC}
 \setCJKfamilyfont{hei}[BoldFont=PingFang SC Semibold]{PingFang SC Medium}

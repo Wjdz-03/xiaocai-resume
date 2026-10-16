@@ -2,7 +2,8 @@
 
 一个**跨 agent** 的简历生成 skill：给它一段职位描述（JD），它从你的个人素材库中筛选、改写经历，生成一份针对性的、**1 页 A4** 的 LaTeX 简历 PDF。
 
-支持 Claude Code / Codex / WorkBuddy 等任何能跑 bash 的 AI 编码助手。
+支持 Claude Code / Codex / WorkBuddy 等任何能运行 Node.js 的 AI 编码助手，
+macOS / Linux / Windows 原生终端（cmd / PowerShell）均可使用。
 
 ## 核心理念
 
@@ -12,23 +13,26 @@
 
 ## 编译环境（最小依赖）
 
+脚本层基于 **Node.js**（纯标准库，无第三方依赖，不产生 `node_modules/`），
 编译需要三样，缺一不可：
 
 1. **xelatex 引擎**（TeX Live）
 2. **中文宏包** `ctex` / `xeCJK` / `xeCJKfntef` / `zhnumber` —— **basic / minimal 版 TeX Live 默认没有**，这是新用户最常卡住的地方
-3. **中文字体**：macOS 自带 `PingFang SC`；Linux 需 `fonts-noto-cjk`（并把 skeleton 字体改为 Noto Sans CJK SC）
+3. **中文字体**：macOS 自带 `PingFang SC`；Windows 自带 `Microsoft YaHei` / `SimSun`；Linux 需 `fonts-noto-cjk`（字体按平台选择：macOS `PingFang SC` / Windows `Microsoft YaHei` / Linux `Noto Sans CJK SC`）
 
 **先自检，再编译**：
 
 ```bash
-bash scripts/check_env.sh
+node scripts/resume.mjs check-env
 ```
 
 它逐项检测，环境不全时退出码非 0，并打印你平台的**最小安装命令**。常见安装：
 
-- macOS 未装任何 TeX Live：`brew install --cask mactex`（完整版，含中文宏包）
+- macOS 未装任何 TeX Live：`brew install --cask mactex`（完整版，含中文宏包）或 `basictex`
 - macOS 已装 basic/minimal，只补中文宏包：`sudo tlmgr install collection-langchinese`
 - Ubuntu/Debian：`sudo apt install texlive-xetex texlive-lang-chinese texlive-fonts-extra fonts-noto-cjk`
+- Windows 未装：到 https://tug.org/texlive/ 下载 TeX Live 安装器，选择 `scheme-basic`
+- Windows 补中文宏包（可能需要管理员权限的终端）：`tlmgr install collection-langchinese enumitem footmisc`
 
 可选：`pyyaml`（仅用于 `check_profile.py` 结构校验；未装会自动跳过，不影响主流程）。
 
@@ -144,11 +148,8 @@ xiaocai-resume/
 │   ├── skeleton.tex           # 简历骨架范本
 │   └── example.profile.yaml   # 示例素材库（虚构，教学用）
 └── scripts/                   # 确定性原语（agent 只调用）
-    ├── check_env.sh           # 体检最小编译环境（引擎/中文宏包/字体），给安装命令
-    ├── new_output.sh          # 建 output/<user>-<slug>-<日期>/
-    ├── check_profile.py       # 校验 profile.yaml（可选，需 pyyaml）
-    ├── build.sh               # 编译（系统 xelatex ×2，先查引擎+中文宏包）
-    └── validate.sh            # 编译产物基础检查（页数 / 明显错误）
+    ├── resume.mjs             # 跨平台 Node CLI（check-env / new-output / build / validate / check-profile）
+    └── check_profile.py       # 校验 profile.yaml（可选，需 pyyaml，经 check-profile 转发）
 ```
 
 用户数据不会进入这个仓库：全局素材库在 `~/.agents/resume-builder/`，
