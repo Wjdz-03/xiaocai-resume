@@ -34,6 +34,19 @@ bash scripts/check_env.sh
 
 ## 安装
 
+### 使用 Skills CLI
+
+如果已安装 Node.js，可以直接使用 Skills CLI 从 GitHub 安装：
+
+```bash
+npx skills add kuangxiaoc/xiaocai-resume
+```
+
+安装后，按照 CLI 提示选择要启用的 agent。这个命令只安装 skill
+（`SKILL.md`、脚本、模板和契约），不会迁移或上传个人素材库。
+
+### 手动安装
+
 把本仓库放到你所用 agent 的 skill 目录（软链或拷贝均可）：
 
 ```bash
