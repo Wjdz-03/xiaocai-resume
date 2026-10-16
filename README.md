@@ -52,6 +52,53 @@ ln -s "$PWD/xiaocai-resume" ~/.agents/skills/xiaocai-resume
 # Codex / 其它读取 AGENTS.md 的 agent：把仓库放进项目根，或让 AGENTS.md 可被读取即可
 ```
 
+## 素材放在哪里
+
+这个 skill 的数据分两层，不要混在一起。
+
+### 1. 全局基础素材库（长期维护）
+
+默认位置：
+
+```text
+~/.agents/resume-builder/profiles/<user>/
+```
+
+这里放**稳定的个人事实**，也就是不随岗位变化的内容：
+
+```yaml
+meta:
+education:
+experience:
+projects:
+skills:
+```
+
+它是长期维护的主素材库。新增经历、修正时间、补充项目成果，都改这里。
+
+### 2. 工作空间本地补充素材（可选）
+
+默认位置：
+
+```text
+<当前工作空间>/profiles/<user>/
+```
+
+这里放**这个项目或这个领域才需要的资料**，比如某类岗位的补充材料、论文附件、
+或从全局素材派生出的岗位方向版本。它不会替代全局素材，除非你明确让 agent
+这么用；两边冲突时，agent 会先问你，不会自动合并。
+
+### 3. 简历输出
+
+输出**永远在你调用 skill 的那个文件夹**下面，不会写回 skill 安装目录，也不会
+写到全局素材库：
+
+```text
+<当前工作空间>/output/<user>-<slug>-<日期>/resume.pdf
+```
+
+这样每次生成的简历都留在对应项目里，素材库继续作为长期事实源被复用。
+
 ## 使用
 
 在你的工作目录里对 agent 说：
@@ -61,23 +108,11 @@ ln -s "$PWD/xiaocai-resume" ~/.agents/skills/xiaocai-resume
 [粘贴 JD，或给 JD 链接]
 ```
 
-素材库默认位置：
-
-```text
-~/.agents/resume-builder/profiles/<user>/
-├── profile.yaml
-├── photo.jpg
-└── attachments/
-```
-
-agent 会按“用户明确路径 → 当前工作空间 `profiles/` → 全局
-`~/.agents/resume-builder/profiles/`”的顺序查找，也可以使用你明确提供的其他资料路径。
-
 首次使用时，agent 会引导你建立素材库：
 1. 你粘贴个人经历文本，或给出旧简历 / 资料的文件路径；
-2. agent 整理成全局或当前工作空间中的 `profile.yaml`，并请你提供证件照；
-3. 之后在任意工作空间只需给 JD，agent 读取已选择的素材库 → 裁剪改写 → 编译 →
-   在当前工作空间产出 `output/<user>-<slug>-<日期>/resume.pdf`。
+2. agent 整理成全局素材库中的 `profile.yaml`，并请你提供证件照；
+3. 之后在任意工作空间只需给 JD，agent 读取素材库 → 裁剪改写 → 编译 →
+   在当前工作空间产出简历。
 
 匹配分析（命中 / 不足 / 建议）默认不主动产出，需要时直接问 agent 即可。
 
@@ -103,22 +138,8 @@ xiaocai-resume/
     └── validate.sh            # 编译产物基础检查（页数 / 明显错误）
 ```
 
-用户数据（运行时在你的工作目录生成）：
-
-```
-<你的工作目录>/
-├── profiles/<user>/                # 可选：当前工作空间专用或覆盖素材
-└── output/<user>-<slug>-<日期>/resume.pdf
-```
-
-全局素材库（不在 skill 仓库中）：
-
-```text
-~/.agents/resume-builder/profiles/<user>/
-├── profile.yaml
-├── photo.jpg
-└── attachments/
-```
+用户数据不会进入这个仓库：全局素材库在 `~/.agents/resume-builder/`，
+本地补充和简历输出在调用 skill 的工作空间。
 
 ## Credits / 第三方组件
 
