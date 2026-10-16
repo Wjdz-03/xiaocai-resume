@@ -49,18 +49,30 @@ description: 根据职位描述（JD）从个人素材库生成针对性的 1 �
    `open_source` 等字段。
 4. 为经历和 bullet 添加 `tags`（例如 `llm`、`backend`、`rag`、`python`）。
 5. 请用户提供证件照，放在选定 profile 目录；没有照片时可以先不放。
-6. 可选执行 `python3 <skill>/scripts/check_profile.py <profile.yaml>`。
+6. 可选执行 `node <skill>/scripts/resume.mjs check-profile <profile.yaml>`
+   （内部转发给 `check_profile.py`，检测不到 Python 时自动跳过）。
 
 ### 1. 环境自检
 
 执行：
 
 ```bash
-bash <skill>/scripts/check_env.sh
+node <skill>/scripts/resume.mjs check-env
 ```
 
 如果失败，按照脚本输出安装最小编译环境（系统级安装先告知用户），安装后
 重新执行。不得跳过失败的环境检查。
+
+### 1.5 按平台选择中文字体
+
+生成 `resume.tex` 时，中文字体按当前平台选择（`check-env` 会打印当前平台
+推荐的字体名，直接采用）：
+
+| 平台 | 中文字体 |
+|------|----------|
+| macOS | `PingFang SC` |
+| Windows | `Microsoft YaHei`（fontspec 找不到显示名时改用 `msyh.ttc`） |
+| Linux | `Noto Sans CJK SC` |
 
 ### 2. 获取并分析 JD
 
@@ -85,15 +97,15 @@ bash <skill>/scripts/check_env.sh
 ### 4. 生成并编译
 
 1. 用脚本创建输出目录：
-   `bash <skill>/scripts/new_output.sh <user> <slug>`
+   `node <skill>/scripts/resume.mjs new-output <user> <slug>`
 2. 参考 `templates/skeleton.tex` 和 `contracts/latex-rules.md`，手写
    `output/.../resume.tex`。
    如果素材库来自全局目录，照片和附件引用必须使用从当前输出目录指向
    `~/.agents/resume-builder/profiles/<user>/` 的正确路径；不要复制整份素材库。
 3. 编译：
-   `bash <skill>/scripts/build.sh output/.../resume.tex`
+   `node <skill>/scripts/resume.mjs build output/.../resume.tex`
 4. 校验：
-   `bash <skill>/scripts/validate.sh output/.../resume.pdf`
+   `node <skill>/scripts/resume.mjs validate output/.../resume.pdf`
 
 脚本失败时必须读取错误信息或日志，修复 `resume.tex` 或环境后重跑，不能跳过
 或隐瞒。脚本只提供基础编译证据，不替代 Agent 的内容判断。
@@ -130,11 +142,12 @@ bash <skill>/scripts/check_env.sh
 
 ## 护栏
 - 不改 `templates/resume.cls`，也不擅自覆盖用户已有 profile。
-- 不手写 output 目录名或日期，必须使用 `new_output.sh`。
+- 不手写 output 目录名或日期，必须使用 `new-output` 子命令。
 - 不编造经历或数据，只改写素材库中的事实。
 - 必须 1 页 A4。
 - 默认不输出 `age`、`gender` 等非必要个人信息，除非用户明确要求。
 - 不把全局素材库复制到 skill 仓库或当前输出目录；只按需引用照片和附件。
 
 ## 依赖
-最小编译环境：`xelatex` 引擎 + 中文宏包 `ctex`/`xeCJK`/`xeCJKfntef`/`zhnumber` + 中文字体。先跑 `scripts/check_env.sh` 自检，缺啥按指引装。`check_profile.py` 可选依赖 `pyyaml`。
+脚本层需要 **Node.js**（纯标准库，无第三方依赖），macOS / Linux / Windows 原生终端均可运行。
+最小编译环境：`xelatex` 引擎 + 中文宏包 `ctex`/`xeCJK`/`xeCJKfntef`/`zhnumber` + 中文字体（见 1.5 的平台字体表）。先跑 `node <skill>/scripts/resume.mjs check-env` 自检，缺啥按指引装。`check_profile.py` 可选依赖 `pyyaml`（经 `check-profile` 子命令转发，无 Python 时自动跳过）。

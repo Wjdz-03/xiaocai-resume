@@ -11,6 +11,9 @@ workflow is documented in `SKILL.md`; keep that file self-contained.
   belong in `profiles/`, and generated resumes belong in `output/`. Workspace
   data directories are ignored by Git.
 - Do not modify `templates/resume.cls` unless explicitly requested.
-- Keep scripts deterministic and preserve their non-zero failure behavior.
+- `scripts/` is now a single cross-platform Node CLI (`scripts/resume.mjs`,
+  standard library only) that replaces the old bash scripts; do not add bash
+  wrappers or extra npm dependencies. Keep scripts deterministic and preserve
+  their non-zero failure behavior.
 - When changing the workflow, update `SKILL.md`, `README.md`, and related
   contracts together.
