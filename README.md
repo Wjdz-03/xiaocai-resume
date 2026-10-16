@@ -68,9 +68,8 @@ ln -s "$PWD/resume-builder" ~/.workbuddy/skills/resume-builder
 
 ```
 resume-builder/
-├── AGENTS.md                  # 权威工作手册（流程 / 护栏 / 脚本约定）
-├── SKILL.md                   # skill 定义（与 AGENTS.md 同步）
-├── CLAUDE.md                  # 指针 → AGENTS.md
+├── SKILL.md                   # skill 定义（完整使用流程）
+├── AGENTS.md                  # 本仓库开发规则（辅助 skill 开发）
 ├── contracts/                 # 契约层
 │   ├── profile.schema.json    # profile.yaml 结构定义
 │   ├── output-contract.md     # 输出目录命名、1 页、文件清单
@@ -84,7 +83,7 @@ resume-builder/
     ├── new_output.sh          # 建 output/<user>-<slug>-<日期>/
     ├── check_profile.py       # 校验 profile.yaml（可选，需 pyyaml）
     ├── build.sh               # 编译（系统 xelatex ×2，先查引擎+中文宏包）
-    └── validate.sh            # 校验 PDF（页数 / 字体）
+    └── validate.sh            # 编译产物基础检查（页数 / 明显错误）
 ```
 
 用户数据（运行时在你的工作目录生成）：
