@@ -1,16 +1,20 @@
 ---
-name: resume-builder
+name: xiaocai-resume
 description: 根据职位描述（JD）从个人素材库生成针对性的 1 页 A4 LaTeX 简历 PDF。跨 agent（Claude Code / Codex / WorkBuddy）。首次使用会引导用户建立素材库 profile.yaml，之后按 JD 裁剪改写、手写 tex、编译校验出 PDF。
 ---
 
 # Resume Builder
 
 ## 它做什么
-输入 JD（文本或 URL）→ 读取用户素材库 `profiles/<user>/profile.yaml` → 筛选 + 改写 + 排序 → 手写 `resume.tex` → 编译校验 → 输出 `output/<user>-<slug>-<日期>/resume.pdf`。
+输入 JD（文本或 URL）→ 定位用户素材库 → 筛选 + 改写 + 排序 → 手写
+`resume.tex` → 编译校验 → 在当前工作空间输出
+`output/<user>-<slug>-<日期>/resume.pdf`。
 
 ## 边界
 - skill 本体（本目录）：契约 / 模板 / 脚本 / 文档，不含真实个人信息。
-- 用户数据（用户工作目录运行时生成，不进 skill 目录）：`profiles/<user>/`、`output/`。
+- 用户数据不放进 skill 本体。默认全局素材库位于
+  `~/.agents/resume-builder/profiles/<user>/`；当前工作空间可以使用
+  `profiles/<user>/` 覆盖或补充；生成结果始终位于当前工作空间的 `output/`。
 
 ## 核心原则
 
@@ -23,20 +27,29 @@ description: 根据职位描述（JD）从个人素材库生成针对性的 1 �
 
 ### 0. 确认素材库
 
-在用户当前工作目录检查 `profiles/<user>/profile.yaml`：
+按以下优先级定位 `profile.yaml`，不要把个人资料复制到 skill 安装目录：
 
-- 不存在：先建立素材库，再继续。
-- 存在：直接进入简历生成流程。
+1. 用户明确指定的 profile 路径；
+2. 当前工作空间的 `profiles/<user>/profile.yaml`；
+3. 全局素材库 `~/.agents/resume-builder/profiles/<user>/profile.yaml`；
+4. 用户明确提供的其他简历、资料或 PDF 路径。
+
+如果发现多个可用 profile，先询问用户本次使用哪一个。当前工作空间的 profile
+可以是全局 profile 的派生版本，用于不同岗位方向；不要静默合并互相冲突的资料。
+如果上述位置都没有可用素材，才引导建立素材库。
 
 首次建立素材库时：
 
 1. 询问用户粘贴个人经历，或提供旧简历、资料文件或 PDF 路径。
-2. 按 `contracts/profile.schema.json` 整理为 `profiles/<user>/profile.yaml`，包含
+2. 询问用户希望保存到当前工作空间，还是全局目录
+   `~/.agents/resume-builder/profiles/<user>/`。用户未指定时，优先建议全局目录，
+   以便其他工作空间复用。
+3. 按 `contracts/profile.schema.json` 整理为选定目录下的 `profile.yaml`，包含
    `meta`、`education`、`experience`、`projects`、`skills`、`awards`、
    `open_source` 等字段。
-3. 为经历和 bullet 添加 `tags`（例如 `llm`、`backend`、`rag`、`python`）。
-4. 请用户提供证件照，放到 `profiles/<user>/photo.jpg`；没有照片时可以先不放。
-5. 可选执行 `python3 <skill>/scripts/check_profile.py <profile.yaml>`。
+4. 为经历和 bullet 添加 `tags`（例如 `llm`、`backend`、`rag`、`python`）。
+5. 请用户提供证件照，放在选定 profile 目录；没有照片时可以先不放。
+6. 可选执行 `python3 <skill>/scripts/check_profile.py <profile.yaml>`。
 
 ### 1. 环境自检
 
@@ -75,6 +88,8 @@ bash <skill>/scripts/check_env.sh
    `bash <skill>/scripts/new_output.sh <user> <slug>`
 2. 参考 `templates/skeleton.tex` 和 `contracts/latex-rules.md`，手写
    `output/.../resume.tex`。
+   如果素材库来自全局目录，照片和附件引用必须使用从当前输出目录指向
+   `~/.agents/resume-builder/profiles/<user>/` 的正确路径；不要复制整份素材库。
 3. 编译：
    `bash <skill>/scripts/build.sh output/.../resume.tex`
 4. 校验：
@@ -104,7 +119,9 @@ bash <skill>/scripts/check_env.sh
 
 ## 需要询问用户的情况
 
-- 没有 `profile.yaml`，且用户尚未提供足够素材；
+- 所有候选位置都没有 `profile.yaml`，且用户尚未提供足够素材；
+- 存在多个 profile，但无法确定本次使用哪一个；
+- 需要在当前工作空间 profile 和全局 profile 之间选择或合并；
 - JD URL 无法访问，且用户没有提供 JD 文本；
 - 岗位名称、用户标识或目标语言无法确定；
 - 素材与 JD 关联很弱，或某条表述的事实依据不足；
@@ -112,11 +129,12 @@ bash <skill>/scripts/check_env.sh
 - 一页内存在多个合理取舍，Agent 无法依据相关性和证据强度做出唯一选择。
 
 ## 护栏
-- 不改 `templates/resume.cls`、`profiles/<user>/profile.yaml`。
+- 不改 `templates/resume.cls`，也不擅自覆盖用户已有 profile。
 - 不手写 output 目录名或日期，必须使用 `new_output.sh`。
 - 不编造经历或数据，只改写素材库中的事实。
 - 必须 1 页 A4。
 - 默认不输出 `age`、`gender` 等非必要个人信息，除非用户明确要求。
+- 不把全局素材库复制到 skill 仓库或当前输出目录；只按需引用照片和附件。
 
 ## 依赖
 最小编译环境：`xelatex` 引擎 + 中文宏包 `ctex`/`xeCJK`/`xeCJKfntef`/`zhnumber` + 中文字体。先跑 `scripts/check_env.sh` 自检，缺啥按指引装。`check_profile.py` 可选依赖 `pyyaml`。

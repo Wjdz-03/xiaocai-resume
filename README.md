@@ -1,4 +1,4 @@
-# resume-builder
+# 小菜简历 / xiaocai-resume
 
 一个**跨 agent** 的简历生成 skill：给它一段职位描述（JD），它从你的个人素材库中筛选、改写经历，生成一份针对性的、**1 页 A4** 的 LaTeX 简历 PDF。
 
@@ -7,8 +7,8 @@
 ## 核心理念
 
 - **素材库 + 按需裁剪**：你的全部经历存为一份结构化的 `profile.yaml`（数据源），每次按 JD 挑相关内容生成针对性简历，而不是每投一个岗位从零写。
-- **自由度与可靠性分层**：agent 负责"判断"（分析 JD、裁剪、改写），脚本负责"不许出错"（建目录、编译、校验页数）。不该自由发挥的全被脚本焊死。
-- **skill 本体与用户数据分离**：本仓库只含契约 / 模板 / 脚本 / 文档，**绝不含真实个人信息**；你的素材库和简历产物在你自己的工作目录生成，不进本仓库。
+- **自由度与可靠性分层**：agent 负责"判断"（分析 JD、裁剪、改写和质量检查），脚本负责机械动作（建目录和编译）。
+- **skill 本体与用户数据分离**：本仓库只含契约 / 模板 / 脚本 / 文档，**绝不含真实个人信息**。默认素材库放在 `~/.agents/resume-builder/profiles/`，简历产物放在调用 skill 的当前工作空间。
 
 ## 编译环境（最小依赖）
 
@@ -37,13 +37,17 @@ bash scripts/check_env.sh
 把本仓库放到你所用 agent 的 skill 目录（软链或拷贝均可）：
 
 ```bash
-git clone https://github.com/kuangxiaoc/resume-builder.git
+git clone https://github.com/kuangxiaoc/xiaocai-resume.git
 
 # Claude Code
-ln -s "$PWD/resume-builder" ~/.claude/skills/resume-builder
+ln -s "$PWD/xiaocai-resume" ~/.claude/skills/xiaocai-resume
 
 # WorkBuddy
-ln -s "$PWD/resume-builder" ~/.workbuddy/skills/resume-builder
+ln -s "$PWD/xiaocai-resume" ~/.workbuddy/skills/xiaocai-resume
+
+# Generic Agent Skills directory
+mkdir -p ~/.agents/skills
+ln -s "$PWD/xiaocai-resume" ~/.agents/skills/xiaocai-resume
 
 # Codex / 其它读取 AGENTS.md 的 agent：把仓库放进项目根，或让 AGENTS.md 可被读取即可
 ```
@@ -57,17 +61,30 @@ ln -s "$PWD/resume-builder" ~/.workbuddy/skills/resume-builder
 [粘贴 JD，或给 JD 链接]
 ```
 
+素材库默认位置：
+
+```text
+~/.agents/resume-builder/profiles/<user>/
+├── profile.yaml
+├── photo.jpg
+└── attachments/
+```
+
+agent 会按“用户明确路径 → 当前工作空间 `profiles/` → 全局
+`~/.agents/resume-builder/profiles/`”的顺序查找，也可以使用你明确提供的其他资料路径。
+
 首次使用时，agent 会引导你建立素材库：
 1. 你粘贴个人经历文本，或给出旧简历 / 资料的文件路径；
-2. agent 整理成 `profiles/<user>/profile.yaml`，并请你提供证件照；
-3. 之后每次只需给 JD，agent 读素材库 → 裁剪改写 → 编译 → 产出 `output/<user>-<slug>-<日期>/resume.pdf`。
+2. agent 整理成全局或当前工作空间中的 `profile.yaml`，并请你提供证件照；
+3. 之后在任意工作空间只需给 JD，agent 读取已选择的素材库 → 裁剪改写 → 编译 →
+   在当前工作空间产出 `output/<user>-<slug>-<日期>/resume.pdf`。
 
 匹配分析（命中 / 不足 / 建议）默认不主动产出，需要时直接问 agent 即可。
 
 ## 目录结构
 
 ```
-resume-builder/
+xiaocai-resume/
 ├── SKILL.md                   # skill 定义（完整使用流程）
 ├── AGENTS.md                  # 本仓库开发规则（辅助 skill 开发）
 ├── contracts/                 # 契约层
@@ -90,9 +107,17 @@ resume-builder/
 
 ```
 <你的工作目录>/
-├── profiles/<user>/profile.yaml   # 你的素材库
-├── profiles/<user>/photo.jpg
+├── profiles/<user>/                # 可选：当前工作空间专用或覆盖素材
 └── output/<user>-<slug>-<日期>/resume.pdf
+```
+
+全局素材库（不在 skill 仓库中）：
+
+```text
+~/.agents/resume-builder/profiles/<user>/
+├── profile.yaml
+├── photo.jpg
+└── attachments/
 ```
 
 ## Credits / 第三方组件

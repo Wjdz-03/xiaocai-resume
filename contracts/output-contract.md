@@ -22,7 +22,12 @@ output/<user>-<slug>-<YYYYMMDD>/
 | `resume.cls` | 编译时由脚本复制 | 同目录才能编译，不手写 |
 | `resume.log` / `resume.aux` 等 | 编译中间产物 | 可被 `.gitignore` 忽略 |
 
-> 论文 PDF 等附件不要塞进输出目录；如简历需要引用，统一放 `profiles/<user>/attachments/`。
+> 论文 PDF 等附件不要塞进输出目录；如简历需要引用，统一放所选 profile
+> 目录下的 `attachments/`。
+
+素材库可以来自当前工作空间的 `profiles/<user>/`、用户明确指定的路径，或全局
+目录 `~/.agents/resume-builder/profiles/<user>/`。全局素材库不复制到输出目录；
+`resume.tex` 只按需引用照片和附件的实际路径。
 
 ## 3. 硬约束
 

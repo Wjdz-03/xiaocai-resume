@@ -12,7 +12,10 @@ agent 直接编写 `resume.tex`，不借助程序渲染，因此必须严格遵�
 
 ## 2. 照片路径
 
-- 照片位于 `profiles/<user>/photo.jpg`。编译发生在 `output/<user>-<slug>-<日期>/`，因此 `resume.tex` 中引用照片必须用**相对路径**：
+- 照片位于所选 profile 目录（例如当前工作空间的 `profiles/<user>/photo.jpg`
+  或全局的 `~/.agents/resume-builder/profiles/<user>/photo.jpg`）。编译发生在
+  `output/<user>-<slug>-<日期>/`，因此 `resume.tex` 中引用照片必须使用从输出目录
+  指向实际文件的正确路径；全局 profile 不要复制到输出目录。
 
   ```latex
   \includegraphics[width=2.0cm]{../../profiles/<user>/photo.jpg}
