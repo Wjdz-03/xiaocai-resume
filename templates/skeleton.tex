@@ -6,11 +6,12 @@
 \ResumeName{<姓名>}
 
 \usepackage{graphicx}
-% 字体按平台选择：macOS 用 PingFang SC；Windows 用 Microsoft YaHei；Linux 用 Noto Sans CJK SC
-\setCJKmainfont{PingFang SC}
-\setCJKsansfont{PingFang SC}
-\setCJKfamilyfont{hei}[BoldFont=PingFang SC Semibold]{PingFang SC Medium}
-\newcommand{\heiti}{\CJKfamily{hei}}
+% Agent 必须将 <CJK_FONT> 替换为 `node scripts/resume.mjs check-env` 输出的推荐字体。
+% 标题族用合成粗体，避免与正文字重相同导致层级消失。
+\setCJKmainfont{<CJK_FONT>}
+\setCJKsansfont{<CJK_FONT>}
+\setCJKfamilyfont{hei}[AutoFakeBold=2.5]{<CJK_FONT>}
+\newcommand{\heiti}{\CJKfamily{hei}\bfseries}
 
 % 标题区（含照片）。照片路径相对本 tex，指向 profiles/<user>/photo.jpg
 \newcommand{\PhotoResumeTitle}{

@@ -44,6 +44,40 @@ function kpseHas(file) {
   return !r.error && r.status === 0;
 }
 
+function probeCjkFont(fontName) {
+  if (!haveCmd('xelatex') || !kpseHas('xeCJK.sty')) return false;
+  const probeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'resume-font-'));
+  const tex = [
+    '\\documentclass{article}',
+    '\\usepackage{xeCJK}',
+    `\\setCJKmainfont{${fontName}}`,
+    '\\begin{document}',
+    '中文测试',
+    '\\end{document}',
+    '',
+  ].join('\n');
+  fs.writeFileSync(path.join(probeDir, 'probe.tex'), tex, 'utf8');
+  const result = spawnSync('xelatex', ['-interaction=nonstopmode', '-file-line-error', 'probe.tex'], {
+    cwd: probeDir,
+    encoding: 'utf8',
+    shell: false,
+  });
+  const logText = `${result.stdout || ''}\n${result.stderr || ''}`;
+  fs.rmSync(probeDir, { recursive: true, force: true });
+  if (result.error || result.status !== 0) return false;
+  return !/Missing character|undefined control sequence|Font .* not found|emergency stop/i.test(logText);
+}
+
+function recommendedCjkFont() {
+  const candidates =
+    PLATFORM === 'darwin'
+      ? ['PingFang SC', 'Hiragino Sans GB']
+      : PLATFORM === 'win32'
+        ? ['Microsoft YaHei', 'msyh.ttc', 'SimSun', 'simsun.ttc', 'SimHei', 'simhei.ttf']
+        : ['Noto Sans CJK SC', 'Source Han Sans SC', 'WenQuanYi Zen Hei', 'SimSun'];
+  return candidates.find((font) => probeCjkFont(font)) || '';
+}
+
 function printUsage(lines, exitCode = 1) {
   for (const line of lines) console.error(line);
   process.exit(exitCode);
@@ -98,40 +132,20 @@ function cmdCheckEnv() {
   }
 
   console.log('== 4. 中文字体 ==');
-  if (PLATFORM === 'darwin') {
-    // macOS 自带 PingFang SC（skeleton.tex 默认字体）
-    console.log('✅ macOS 自带 PingFang SC（推荐字体: PingFang SC）');
-  } else if (PLATFORM === 'win32') {
-    const fontsDir = path.join(process.env.SystemRoot || 'C:\\Windows', 'Fonts');
-    const hasFont = ['msyh.ttc', 'simhei.ttf', 'simsun.ttc'].some((f) =>
-      fs.existsSync(path.join(fontsDir, f))
-    );
-    if (hasFont) {
-      console.log('✅ 检测到中文字体（推荐字体: Microsoft YaHei）');
-    } else {
-      console.log(
-        '❌ 未检测到中文字体（Windows 需要 Microsoft YaHei 或 SimSun，推荐字体: Microsoft YaHei）'
-      );
-      missing = 1;
-    }
+  const cjkFont = recommendedCjkFont();
+  if (cjkFont) {
+    console.log(`✅ 检测到可由 XeLaTeX 加载的中文字体（推荐字体: ${cjkFont}）`);
   } else {
-    // linux：fc-list 检测；无 fc-list 时只警告不判失败
-    if (!haveCmd('fc-list')) {
-      console.log(
-        '⚠️ 无 fc-list，无法检测字体；若编译报字体缺失请安装中文字体（推荐字体: Noto Sans CJK SC）'
-      );
-    } else {
-      const r = spawnSync('fc-list', [':lang=zh'], { encoding: 'utf8', shell: false });
-      const out = (r.stdout || '').toLowerCase();
-      if (/noto|source han|wqy|simsun|simhei|yahei|pingfang/.test(out)) {
-        console.log('✅ 检测到中文字体（推荐字体: Noto Sans CJK SC）');
-      } else {
-        console.log(
-          '❌ 未检测到中文字体（Linux 请装 fonts-noto-cjk，并把字体改为 Noto Sans CJK SC，推荐字体: Noto Sans CJK SC）'
-        );
-        missing = 1;
-      }
-    }
+    console.log(
+      `❌ 未检测到可由 XeLaTeX 加载的中文字体（${
+        PLATFORM === 'linux'
+          ? 'Linux 请装 fonts-noto-cjk'
+          : PLATFORM === 'darwin'
+            ? 'macOS 请检查字体是否已注册到系统字体库；文件存在不代表 fontspec 可按名字找到'
+            : 'Windows 请检查 Microsoft YaHei / SimSun / SimHei 或对应字体文件是否可被 fontspec 找到'
+      }）`
+    );
+    missing = 1;
   }
 
   console.log();
@@ -224,7 +238,7 @@ function cmdBuild(args) {
 
   // 连续跑两次生成正确的 PDF 书签；输出透传给调用方
   for (let i = 0; i < 2; i++) {
-    const r = spawnSync('xelatex', [`${basename}.tex`], {
+    const r = spawnSync('xelatex', ['-interaction=nonstopmode', `${basename}.tex`], {
       cwd: dir,
       stdio: 'inherit',
       shell: false,

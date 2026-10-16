@@ -8,18 +8,8 @@ agent 直接编写 `resume.tex`，不借助程序渲染，因此必须严格遵�
 ## 1. 文档类与模板
 
 - 文档类固定：`\documentclass{resume}`，**不要修改 `templates/resume.cls`**。
-- 中文字体按平台选择（`node scripts/resume.mjs check-env` 会打印当前平台推荐字体名）：
-
-  | 平台 | 中文字体 | 写法 |
-  |------|----------|------|
-  | macOS | `PingFang SC` | `\setCJKmainfont{PingFang SC}` |
-  | Windows | `Microsoft YaHei` | `\setCJKmainfont{Microsoft YaHei}` |
-  | Linux | `Noto Sans CJK SC` | `\setCJKmainfont{Noto Sans CJK SC}` |
-
-  > Windows 注：部分 TeX Live 环境下 fontspec 按显示名 `Microsoft YaHei`
-  > 找不到字体（报 "The font cannot be found"）。此时改用字体文件名：
-  > `\setCJKmainfont{msyh.ttc}`（黑体为 `msyhbd.ttc`），或
-  > `\setCJKmainfont{SimSun}` / `\setCJKmainfont{simsun.ttc}`。
+- 中文字体用 `node scripts/resume.mjs check-env` 输出的“推荐字体”替换模板中的
+  `<CJK_FONT>`。字体文件存在不代表 XeTeX 能按家族名加载，所以一切以探测结果为准。
 
 ## 2. 照片路径
 
@@ -49,6 +39,7 @@ agent 直接编写 `resume.tex`，不借助程序渲染，因此必须严格遵�
 ## 4. 占位符
 
 - 标题行的岗位名位置，用 `<POSITION_LINE>` 标识，agent 生成时**替换为真实目标岗位名**（如 `AI 质量与评测方向实习生`）。
+- 字体位置用 `<CJK_FONT>` 标识，agent 生成时必须替换为 `check-env` 输出的字体名。
 
 ## 5. 禁止项
 

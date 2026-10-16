@@ -63,16 +63,8 @@ node <skill>/scripts/resume.mjs check-env
 如果失败，按照脚本输出安装最小编译环境（系统级安装先告知用户），安装后
 重新执行。不得跳过失败的环境检查。
 
-### 1.5 按平台选择中文字体
-
-生成 `resume.tex` 时，中文字体按当前平台选择（`check-env` 会打印当前平台
-推荐的字体名，直接采用）：
-
-| 平台 | 中文字体 |
-|------|----------|
-| macOS | `PingFang SC` |
-| Windows | `Microsoft YaHei`（fontspec 找不到显示名时改用 `msyh.ttc`） |
-| Linux | `Noto Sans CJK SC` |
+生成 `resume.tex` 时，用 `check-env` 输出里的“推荐字体”替换模板中的
+`<CJK_FONT>`。字体是否可用只能以实际探测为准，不要按操作系统假设。
 
 ### 2. 获取并分析 JD
 

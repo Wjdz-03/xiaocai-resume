@@ -18,7 +18,9 @@ macOS / Linux / Windows 原生终端（cmd / PowerShell）均可使用。
 
 1. **xelatex 引擎**（TeX Live）
 2. **中文宏包** `ctex` / `xeCJK` / `xeCJKfntef` / `zhnumber` —— **basic / minimal 版 TeX Live 默认没有**，这是新用户最常卡住的地方
-3. **中文字体**：macOS 自带 `PingFang SC`；Windows 自带 `Microsoft YaHei` / `SimSun`；Linux 需 `fonts-noto-cjk`（字体按平台选择：macOS `PingFang SC` / Windows `Microsoft YaHei` / Linux `Noto Sans CJK SC`）
+3. **中文字体**：`check-env` 会用 XeLaTeX 实际探测可加载的字体；macOS 优先
+   `PingFang SC`，Windows 优先 `Microsoft YaHei`，Linux 优先 `Noto Sans CJK SC`，
+   不可用时用脚本打印的 fallback。字体是否可用只能以探测为准，不按系统假设。
 
 **先自检，再编译**：
 
