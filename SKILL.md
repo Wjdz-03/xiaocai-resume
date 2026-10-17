@@ -88,19 +88,22 @@ node <skill>/scripts/resume.mjs check-env
 
 ### 4. 生成并编译
 
-1. 用脚本创建输出目录：
-   `node <skill>/scripts/resume.mjs new-output <user> <slug>`
+1. 用脚本创建输出目录；带证件照时加 `--photo`（复制进输出目录，tex 里引用
+   本地 `photo.<ext>`，见 `contracts/latex-rules.md` 第 2 节）：
+   `node <skill>/scripts/resume.mjs new-output <user> <slug> [--photo <profile>/photo.jpg]`
 2. 参考 `templates/skeleton.tex` 和 `contracts/latex-rules.md`，手写
    `output/.../resume.tex`。
-   如果素材库来自全局目录，照片和附件引用必须使用从当前输出目录指向
-   `~/.agents/resume-builder/profiles/<user>/` 的正确路径；不要复制整份素材库。
+   照片是可选项：国内校招/国企岗位通常带照片，外企或用户要求时不带。
+   不要复制整份素材库到输出目录。
 3. 编译：
    `node <skill>/scripts/resume.mjs build output/.../resume.tex`
 4. 校验：
    `node <skill>/scripts/resume.mjs validate output/.../resume.pdf`
 
-脚本失败时必须读取错误信息或日志，修复 `resume.tex` 或环境后重跑，不能跳过
-或隐瞒。脚本只提供基础编译证据，不替代 Agent 的内容判断。
+`validate` 除页数/编译错误外，还会做内容检查（联系方式、日期格式、超长 bullet、
+夸大词、残留占位符）并输出「事实核对清单」。脚本失败时必须读取错误信息或日志，
+修复 `resume.tex` 或环境后重跑，不能跳过或隐瞒。脚本只提供基础编译证据，不替代
+Agent 的内容判断。
 
 ### 5. Agent 自检与迭代
 
@@ -116,10 +119,18 @@ node <skill>/scripts/resume.mjs check-env
 缩短低价值描述，减少非核心技能，最后才调整间距或字号。每次修改后重新编译
 并重新检查；不得用极端缩小字号掩盖内容过多。
 
-### 6. 交付
+### 6. 事实核对清单
 
-告知用户生成的 PDF 路径。匹配分析默认不主动输出；用户需要时再提供
-“命中 / 不足 / 建议”三段分析。
+交付前必须把 `validate` 输出的「事实核对清单」（量化断言、时间区间、夸大词命中）
+逐条请用户确认，可整理为输出目录下的 `fact-check.md`。无法核实的条目删掉或改成
+保守表述，不要带着未确认的量化断言交付。详见 `contracts/output-contract.md` 3.5。
+
+### 7. 交付
+
+告知用户生成的 PDF 路径，并按三件套交付：`resume.pdf` + `resume.tex`（可编辑源）+
+事实核对结果。明确告诉用户："要调整内容/措辞/增删经历直接说，我改 tex 后重新
+编译出新 PDF"——不要让 PDF 看起来是改不动的终点。匹配分析默认不主动输出；
+用户需要时再提供"命中 / 不足 / 建议"三段分析。
 
 ## 需要询问用户的情况
 
@@ -137,8 +148,10 @@ node <skill>/scripts/resume.mjs check-env
 - 不手写 output 目录名或日期，必须使用 `new-output` 子命令。
 - 不编造经历或数据，只改写素材库中的事实。
 - 必须 1 页 A4。
+- 交付前必须完成事实核对清单（`validate` 输出的量化断言/日期/夸大词），未确认的条目删掉或改保守表述。
+- 交付三件套：`resume.pdf` + `resume.tex` + 事实核对结果；明确告知用户可继续改 tex 重新编译。
 - 默认不输出 `age`、`gender` 等非必要个人信息，除非用户明确要求。
-- 不把全局素材库复制到 skill 仓库或当前输出目录；只按需引用照片和附件。
+- 不把全局素材库复制到 skill 仓库或当前输出目录；照片用 `new-output --photo` 复制为输出目录的 `photo.<ext>`。
 
 ## 依赖
 脚本层需要 **Node.js**（纯标准库，无第三方依赖），macOS / Linux / Windows 原生终端均可运行。

@@ -13,7 +13,8 @@
 \setCJKfamilyfont{hei}[AutoFakeBold=2.5]{<CJK_FONT>}
 \newcommand{\heiti}{\CJKfamily{hei}\bfseries}
 
-% 标题区（含照片）。照片路径相对本 tex，指向 profiles/<user>/photo.jpg
+% 标题区（含照片）。照片是可选项：无照片时删掉右侧 minipage，左侧改 \textwidth。
+% 带照片时推荐 new-output --photo 复制到输出目录后引用本地 photo.<ext>
 \newcommand{\PhotoResumeTitle}{
   \noindent
   \begin{minipage}[c]{0.80\textwidth}
@@ -29,7 +30,7 @@
   \hfill
   \begin{minipage}[c]{0.14\textwidth}
     \centering
-    \includegraphics[width=2.0cm]{../../profiles/<user>/photo.jpg}
+    \includegraphics[width=2.0cm]{photo.jpg}
   \end{minipage}
   \vspace{0.2em}
 }
