@@ -181,14 +181,36 @@ function cmdCheckEnv() {
 // ---------- new-output ----------
 
 function cmdNewOutput(args) {
-  if (args.length < 2) {
+  // 解析可选参数 --photo <path>（把证件照复制进输出目录，tex 里引用本地 photo.<ext>）
+  let photo = null;
+  const positional = [];
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === '--photo') {
+      photo = args[++i];
+    } else if (args[i].startsWith('--photo=')) {
+      photo = args[i].slice('--photo='.length);
+    } else {
+      positional.push(args[i]);
+    }
+  }
+  if (positional.length < 2) {
     printUsage([
-      '用法: node scripts/resume.mjs new-output <user> <slug>',
-      '示例: node scripts/resume.mjs new-output zhangming ai-quality',
+      '用法: node scripts/resume.mjs new-output <user> <slug> [--photo <path>]',
+      '示例: node scripts/resume.mjs new-output zhangming ai-quality --photo photo.jpg',
     ]);
   }
-  const [user, slug] = args;
+  const [user, slug] = positional;
   const dest = path.join('output', `${user}-${slug}-${localDateYYYYMMDD()}`);
+
+  // 先校验照片存在，再建目录，避免失败时留下空目录
+  let photoName = null;
+  if (photo !== null) {
+    if (!fs.existsSync(photo)) {
+      console.error(`❌ 照片不存在: ${photo}`);
+      process.exit(1);
+    }
+    photoName = `photo${path.extname(photo).toLowerCase() || '.jpg'}`;
+  }
 
   if (fs.existsSync(dest)) {
     console.error(`❌ 目录已存在: ${dest}（同日重复生成请换不同 slug）`);
@@ -196,6 +218,12 @@ function cmdNewOutput(args) {
   }
 
   fs.mkdirSync(dest, { recursive: true });
+
+  if (photoName !== null) {
+    fs.copyFileSync(photo, path.join(dest, photoName));
+    console.log(`✅ 已复制照片: ${photoName}（tex 中引用 {${photoName}}）`);
+  }
+
   console.log(dest);
 }
 
@@ -297,9 +325,113 @@ function cmdValidate(args) {
     console.error(`⚠️ 未找到日志 ${log}，跳过编译日志检查；请 Agent 直接检查 PDF`);
   }
 
+  // ---- 内容检查（读同名 resume.tex；没有 tex 时跳过）----
+  const tex = path.join(dir, `${basename}.tex`);
+  if (fs.existsSync(tex)) {
+    checkResumeContent(fs.readFileSync(tex, 'utf8'));
+  } else {
+    console.error(`⚠️ 未找到同名 ${basename}.tex，跳过内容检查`);
+  }
+
   console.log(`✅ 校验通过: ${pdf}`);
   console.error('⚠️ 仍需由 Agent 检查内容、事实边界和页面视觉质量');
   process.exit(0);
+}
+
+/** tex 内容检查：联系方式 / 日期格式 / 超长 bullet / 夸大词 / 残留占位符。 */
+function checkResumeContent(tex) {
+  const problems = [];
+  const warnings = [];
+
+  // 1) 联系方式：电话（含分隔符的可疑格式）与邮箱格式
+  const badPhone = tex.match(/(?<!\d)1[3-9]\d[\d\s-]{8,}(?!\d)/g) || [];
+  for (const p of badPhone) {
+    if (!/^1[3-9]\d{9}$/.test(p.replace(/[\s-]/g, ''))) {
+      warnings.push(`电话格式可疑: ${p.trim()}`);
+    }
+  }
+  // 邮箱：抓含 @ 的 token 里明显畸形的（缺域名 / 缺顶级域）
+  const emailLike = tex.match(/[\w.+-]+@[\w.-]*/g) || [];
+  for (const e of emailLike) {
+    if (!/^[\w.+-]+@[\w-]+(\.[\w-]+)+$/.test(e)) {
+      warnings.push(`邮箱格式可疑: ${e}`);
+    }
+  }
+
+  // 2) 日期格式：\ResumeItem 第 4 参里的日期；目标 YYYY.MM / YYYY.MM -- YYYY.MM / YYYY.MM -- 至今
+  const itemBlocks = [...tex.matchAll(/\]\[([^\]]*)\]\s*$/gm)];
+  for (const m of itemBlocks) {
+    const d = m[1].trim();
+    if (!d) continue;
+    const ok =
+      /^(\d{4}(\.\d{2})?)(\s*(--|-|—|~)\s*(\d{4}(\.\d{2})?|至今))?$/.test(d) ||
+      /^present$|^now$|^current$/i.test(d);
+    if (!ok) warnings.push(`日期格式请统一为 YYYY.MM 或 YYYY.MM -- YYYY.MM/至今: "${d}"`);
+  }
+  // 常见混排：中文日期、英文月名混用
+  if (/\d{4}\s*年\s*\d{1,2}\s*月/.test(tex) || /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{4}/.test(tex)) {
+    warnings.push('日期存在中英混排（如"2024年3月"或 "Mar 2024"），建议统一为 YYYY.MM');
+  }
+
+  // 3) 超长 bullet：itemize 里单条 \item 超过 120 字符（中文按 1 字符计）
+  const items = tex.match(/\\item[^\\]{1,600}/g) || [];
+  for (const it of items) {
+    const text = it.replace(/^\\item\s*/, '').replace(/\s+/g, ' ');
+    if (text.length > 120) {
+      warnings.push(`bullet 过长（${text.length} 字符），建议拆分或精简: "${text.slice(0, 40)}..."`);
+    }
+  }
+
+  // 4) 夸大词 + 量化断言：无数字支撑的夸大表述
+  const hypeRe = /(显著提升|大幅优化|极大改善|大幅降低|业界领先|顶尖|精通|深谙|精通各种|遥遥领先|最强|完美|卓越|惊人)/g;
+  const hypeHits = [...tex.matchAll(hypeRe)];
+  for (const h of hypeHits) {
+    warnings.push(`夸大词"${h[1]}"：请给出数据依据，或改为可核实的表述`);
+  }
+  // 量化断言必须带数字（如"提升30%"是好的；"提升明显"会被夸大词抓）
+  const vagueQuant = /(提升|下降|降低|增长|优化)(明显|很多|很多|显著)/g;
+  for (const v of tex.matchAll(vagueQuant)) {
+    warnings.push(`量化描述 "${v[0]}" 缺少具体数字，建议补数据或删除`);
+  }
+
+  // 5) 残留占位符
+  const placeholders = tex.match(/<[A-Z_]{3,}>|\bTODO\b|\bTBD\b|待补充|XX+/g) || [];
+  for (const p of new Set(placeholders)) {
+    problems.push(`残留占位符: ${p}`);
+  }
+
+  // 输出：先列警告（建议修）供参考，再列问题（必须修）；有任一问题则整体失败
+  if (warnings.length > 0) {
+    console.error(`⚠️ 内容检查提示（建议修正，${warnings.length} 项）:`);
+    for (const w of warnings.slice(0, 15)) console.error(`  ${w}`);
+    console.error('  → 以上为脚本提示，Agent 需逐条判断后决定是否修正。');
+  }
+  if (problems.length > 0) {
+    console.error('❌ 内容检查发现问题（必须修复）:');
+    for (const p of problems.slice(0, 10)) console.error(`  ${p}`);
+    process.exit(1);
+  }
+
+  // ---- 事实核对清单（factual claims）----
+  console.log();
+  console.log('== 事实核对清单（Agent 交付前必须逐条向用户确认） ==');
+  const claims = [];
+  // 年份区间、百分比、星级、评分、名次等硬指标
+  // tex 中 % 常写作 \%，正则需容忍转义反斜杠
+  const pct = tex.match(/(\d+(\.\d+)?)\s*\\?%/g) || [];
+  const stars = tex.match(/(\d+)\s*stars?/gi) || [];
+  const ranks = tex.match(/(前\s*\d+%|top\s*\d+%?|前\s*\d+\s*名|排名第?\s*\d+)/gi) || [];
+  const quant = tex.match(/(提升|下降|降低|增长|优化|覆盖|处理|支持)\s*了?\s*\d+(\.\d+)?\s*(%|倍|万|亿|个|条|次|s|ms)/gi) || [];
+  const ranges = tex.match(/从\s*\d+(\.\d+)?\s*(提升|增长|优化)?\s*到\s*\d+(\.\d+)?/g) || [];
+  const years = tex.match(/\d{4}\s*\.\s*\d{2}\s*(--|-|—|~|至)\s*(\d{4}\s*\.\s*\d{2}|至今)/g) || [];
+  const unique = new Set([...pct, ...stars, ...ranks, ...quant, ...ranges, ...years]);
+  for (const c of unique) claims.push(c.trim());
+  if (claims.length === 0) {
+    console.log('  （未发现量化断言；仍需确认经历名称、职责范围和技能水平的真实性）');
+  } else {
+    for (const c of claims.slice(0, 20)) console.log(`  □ ${c}`);
+  }
+  console.log('  → 交付前请用户对以上每一项勾选确认；无法核实的删掉或改成保守表述。');
 }
 
 // ---------- check-profile ----------
@@ -336,9 +468,13 @@ const USAGE = [
   '',
   '命令:',
   '  check-env                            体检最小编译环境（引擎/中文宏包/字体）',
-  '  new-output <user> <slug>             创建 output/<user>-<slug>-<YYYYMMDD>/',
+  '  new-output <user> <slug> [--photo <path>]',
+  '                                       创建 output/<user>-<slug>-<YYYYMMDD>/，',
+  '                                       --photo 可选：复制证件照为输出目录的 photo.<ext>',
   '  build <path/to/resume.tex>           编译（xelatex ×2，先查引擎+中文宏包）',
-  '  validate <path/to/resume.pdf>        编译产物基础检查（页数 / 明显错误）',
+  '  validate <path/to/resume.pdf>        产物检查：页数/编译错误 + 内容检查',
+  '                                       （联系方式/日期/超长 bullet/夸大词/占位符）',
+  '                                       + 事实核对清单（交付前须逐条确认）',
   '  check-profile <path/to/profile.yaml> 校验 profile.yaml（可选，需 python3 + pyyaml）',
 ];
 

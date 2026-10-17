@@ -13,14 +13,28 @@ agent 直接编写 `resume.tex`，不借助程序渲染，因此必须严格遵�
 
 ## 2. 照片路径
 
-- 照片位于所选 profile 目录（例如当前工作空间的 `profiles/<user>/photo.jpg`
-  或全局的 `~/.agents/resume-builder/profiles/<user>/photo.jpg`）。编译发生在
-  `output/<user>-<slug>-<日期>/`，因此 `resume.tex` 中引用照片必须使用从输出目录
-  指向实际文件的正确路径；全局 profile 不要复制到输出目录。
+- 照片是**可选项**：国内校招/国企岗位偏好带照片，外企、海外或明确要求"免照片"时不用照片，
+  直接用无照片的标题区（见 `templates/skeleton.tex` 的注释）。
+- 带照片时，**推荐做法**是 `new-output` 时用 `--photo` 把证件照复制进输出目录：
+
+  ```bash
+  node <skill>/scripts/resume.mjs new-output <user> <slug> --photo <profile目录>/photo.jpg
+  ```
+
+  脚本会把照片复制为输出目录下的 `photo.<ext>`，此时 `resume.tex` 直接引用本地文件即可，
+  不受工作空间/全局素材库位置影响：
+
+  ```latex
+  \includegraphics[width=2.0cm]{photo.jpg}
+  ```
+
+- 仅当不想复制照片时，才引用实际路径（注意全局素材库不要复制到输出目录）：
 
   ```latex
   \includegraphics[width=2.0cm]{../../profiles/<user>/photo.jpg}
   ```
+
+- 照片建议使用证件照比例（约 3:4 竖版），显示宽度固定 `2.0cm`。
 
 ## 3. resume.cls 提供的结构命令
 
