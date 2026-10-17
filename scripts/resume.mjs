@@ -434,6 +434,68 @@ function checkResumeContent(tex) {
   console.log('  → 交付前请用户对以上每一项勾选确认；无法核实的删掉或改成保守表述。');
 }
 
+// ---------- preview ----------
+
+/** 预览用中文字体：优先与 check-env 相同的实测探测，探测不到时用平台默认。 */
+function previewFont() {
+  return (
+    recommendedCjkFont() ||
+    (PLATFORM === 'darwin' ? 'PingFang SC' : PLATFORM === 'win32' ? 'msyh.ttc' : 'Noto Sans CJK SC')
+  );
+}
+
+function cmdPreview(args) {
+  const previewDir = path.join(SCRIPT_DIR, '..', 'templates', 'preview');
+  const list = args.filter((a) => !a.startsWith('--'));
+  const outIdx = args.indexOf('--out');
+
+  // 列出模式：无模板名参数时打印全部模板
+  if (list.length === 0) {
+    if (!fs.existsSync(previewDir)) {
+      console.error(`❌ 找不到模板目录: ${previewDir}`);
+      process.exit(1);
+    }
+    const files = fs.readdirSync(previewDir).filter((f) => f.endsWith('.tex'));
+    if (files.length === 0) {
+      console.error('⚠️ 模板目录为空');
+      process.exit(0);
+    }
+    console.log('可用模板（node scripts/resume.mjs preview <name> 预览编译）:');
+    for (const f of files) {
+      const name = path.basename(f, '.tex');
+      // 取样例第二行注释作为简介
+      const first = fs.readFileSync(path.join(previewDir, f), 'utf8').split(/\r?\n/)[1] || '';
+      const brief = first.replace(/^%\s*/, '');
+      console.log(`  ${name}${brief ? '  —— ' + brief : ''}`);
+    }
+    process.exit(0);
+  }
+
+  // 编译模式：preview <name> [--out <dir>]
+  const name = list[0];
+  const src = path.join(previewDir, `${name}.tex`);
+  if (!fs.existsSync(src)) {
+    console.error(`❌ 模板不存在: ${name}（先跑不带参数的 preview 查看列表）`);
+    process.exit(1);
+  }
+
+  const outDir =
+    outIdx >= 0 && args[outIdx + 1]
+      ? args[outIdx + 1]
+      : path.join('output', `preview-${name}-${localDateYYYYMMDD()}`);
+  fs.mkdirSync(outDir, { recursive: true });
+
+  // 按探测结果替换字体占位符，落盘为 resume.tex 再走常规 build
+  const font = previewFont();
+  const tex = fs.readFileSync(src, 'utf8').replaceAll('<CJK_FONT>', font);
+  const destTex = path.join(outDir, 'resume.tex');
+  fs.writeFileSync(destTex, tex);
+  console.log(`✅ 模板 ${name} 已应用字体 ${font}，输出到 ${destTex}`);
+  console.log(`   看完效果想定制内容，把 ${destTex} 作为起点改写即可。`);
+
+  cmdBuild([destTex]);
+}
+
 // ---------- check-profile ----------
 
 function cmdCheckProfile(args) {
@@ -475,6 +537,9 @@ const USAGE = [
   '  validate <path/to/resume.pdf>        产物检查：页数/编译错误 + 内容检查',
   '                                       （联系方式/日期/超长 bullet/夸大词/占位符）',
   '                                       + 事实核对清单（交付前须逐条确认）',
+  '  preview                              列出可用模板（templates/preview/*.tex）',
+  '  preview <name> [--out <dir>]         按平台字体编译模板预览 PDF，可直接改其输出',
+  '                                       的 resume.tex 作为正式简历起点',
   '  check-profile <path/to/profile.yaml> 校验 profile.yaml（可选，需 python3 + pyyaml）',
 ];
 
@@ -492,6 +557,9 @@ switch (command) {
     break;
   case 'validate':
     cmdValidate(rest);
+    break;
+  case 'preview':
+    cmdPreview(rest);
     break;
   case 'check-profile':
     cmdCheckProfile(rest);

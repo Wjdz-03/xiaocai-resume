@@ -52,6 +52,11 @@ description: 根据职位描述（JD）从个人素材库生成针对性的 1 �
 6. 可选执行 `node <skill>/scripts/resume.mjs check-profile <profile.yaml>`
    （内部转发给 `check_profile.py`，检测不到 Python 时自动跳过）。
 
+素材太少（"没什么可写"）时，按 `contracts/intake-playbook.md` 的采料问卷逐项追问
+（课程设计/大作业/毕设/竞赛/社团/兼职/自学项目都是合法素材），并参考其中的人群
+playbook（应届无实习 / 有实习 / 考研 gap / 转行）调整结构侧重。挖不出来时如实告知，
+建议先做练手项目，不要编造填充。
+
 ### 1. 环境自检
 
 执行：
@@ -78,21 +83,33 @@ node <skill>/scripts/resume.mjs check-env
 
 ### 3. 改写内容
 
+按 `contracts/bullet-craft.md` 的 STAR 结构与动作动词库改写：每条 bullet
+= 动词开头 + 技术/方法 + 产出/结果（能量化就量化，没有数字用规模或产出物替代），
+完成度用 `bullet-craft.md` 的自检清单逐条过。
+
 允许调整句式、合并同一经历中的已有事实、重排 bullet，以及使用 JD 中更准确
 的同义术语。禁止增加素材库中不存在的技术栈、指标、职责、团队规模、时间、
-公司或项目事实；不得把“参与”改成“负责”，把“协助”改成“主导”，或把课程
+公司或项目事实；不得把"参与"改成"负责"，把"协助"改成"主导"，或把课程
 项目改成商业项目。
 
 对每条最终 bullet 反向核对：其中每个事实是否都能在 `profile.yaml` 找到依据。
 无法确认时删除该表述或询问用户。
+
+JD 关键词对齐按 `contracts/jd-alignment.md`：只换叫法不改事实，用 JD 的词汇
+（同义替换、顺序调整），最相关关键词放在第一条 bullet；"必须匹配"档未命中的
+列进覆盖报告的"不足"，不硬补。
 
 ### 4. 生成并编译
 
 1. 用脚本创建输出目录；带证件照时加 `--photo`（复制进输出目录，tex 里引用
    本地 `photo.<ext>`，见 `contracts/latex-rules.md` 第 2 节）：
    `node <skill>/scripts/resume.mjs new-output <user> <slug> [--photo <profile>/photo.jpg]`
-2. 参考 `templates/skeleton.tex` 和 `contracts/latex-rules.md`，手写
-   `output/.../resume.tex`。
+2. 选排版风格并手写 `output/.../resume.tex`（参考 `templates/skeleton.tex` 和
+   `contracts/latex-rules.md`）。
+   默认用 `skeleton.tex` 的经典单栏；用户想要别的观感时，先跑
+   `node <skill>/scripts/resume.mjs preview` 看模板列表、`preview <name>` 编译
+   各模板效果图让用户挑（`t1-classic` 信息密集 / `t3-minimal` 极简留白），
+   选中的模板输出的 `resume.tex` 可直接作为改写起点。
    照片是可选项：国内校招/国企岗位通常带照片，外企或用户要求时不带。
    不要复制整份素材库到输出目录。
 3. 编译：

@@ -1,0 +1,46 @@
+% !TeX TS-program = xelatex
+% T1 经典单栏（信息密集，适合经历多的求职者）
+% 编译由 scripts/resume.mjs preview 负责（自动按平台替换字体占位符）
+\documentclass{resume}
+\ResumeName{李 华}
+
+\usepackage{graphicx}
+\setCJKmainfont{<CJK_FONT>}
+\setCJKsansfont{<CJK_FONT>}
+\setCJKfamilyfont{hei}[AutoFakeBold=2.5]{<CJK_FONT>}
+\newcommand{\heiti}{\CJKfamily{hei}\bfseries}
+
+% T1 特征：紧凑单栏标题 + 密集信息（照片版布局见 skeleton.tex 的 \PhotoResumeTitle）
+\ResumeContacts{求职意向：后端开发实习生, 13912345678, \ResumeUrl{mailto:lihua@example.com}{lihua@example.com}, 杭州}
+
+\begin{document}
+
+\ResumeTitle
+
+\section{教育经历}
+\ResumeItem[某大学|本科]{某大学}[\textnormal{软件工程\textbar} 本科][2022.09 -- 2026.06]
+主修课程：数据结构、操作系统、计算机网络、数据库系统、机器学习基础
+
+\GrayText{奖项：校级一等奖学金（2024、2025）}
+
+\section{项目经历}
+\ResumeItem{图书借阅管理系统}[课程设计/Java·Spring Boot·MySQL][2025.03 -- 2025.06]
+\begin{itemize}
+  \item 独立实现借阅/归还/超期统计 6 个核心功能模块，设计 6 张表的数据库结构
+  \item 用 Spring Boot 构建后端接口，配合 Vue 完成借阅台账页面
+\end{itemize}
+
+\ResumeItem{个人博客系统}[自学项目/React·FastAPI][2024.11 -- 2025.01]
+\begin{itemize}
+  \item 实现文章发布与评论功能，自行扩展标签分类与全文搜索
+\end{itemize}
+
+\section{技能}
+\ResumeItem{后端}{Java、Spring Boot、MySQL、Redis（课程设计与自学项目中使用）}
+\ResumeItem{前端与工具}{Vue、React、Git、Linux 基本操作}
+
+\section{校园经历}
+\ResumeItem{学生会宣传部}[\textnormal{部长}][2023.09 -- 2024.06]
+组织校级迎新晚会（参与 500+ 人），统筹 8 人宣传组完成物料设计与现场执行
+
+\end{document}

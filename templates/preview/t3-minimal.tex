@@ -1,0 +1,46 @@
+% !TeX TS-program = xelatex
+% T3 极简留白（无照片、大标题，适合经历精炼的求职者）
+% 编译由 scripts/resume.mjs preview 负责（自动按平台替换字体占位符）
+\documentclass{resume}
+\ResumeName{李 华}
+
+\usepackage{graphicx}
+\setCJKmainfont{<CJK_FONT>}
+\setCJKsansfont{<CJK_FONT>}
+\setCJKfamilyfont{hei}[AutoFakeBold=2.5]{<CJK_FONT>}
+\newcommand{\heiti}{\CJKfamily{hei}\bfseries}
+
+% T3 特征：无照片、极简标题、每节只留最必要信息、留白多
+\ResumeContacts{后端开发实习生, 杭州, 13912345678, \ResumeUrl{mailto:lihua@example.com}{lihua@example.com}}
+
+\begin{document}
+
+% T3 用大字号单行标题 + 一行联系方式，代替信息密集的标题区
+\begin{center}
+  {\zihao{-2}\heiti 李华}
+\end{center}
+\vspace{-1.0em}
+\begin{center}
+  \GrayText{后端开发实习生 | 杭州 | 13912345678 | lihua@example.com}
+\end{center}
+\vspace{0.5em}
+
+\section{教育经历}
+\ResumeItem[某大学|本科]{某大学}[\textnormal{软件工程\textbar} 本科][2022.09 -- 2026.06]
+\GrayText{校级一等奖学金（2024、2025）}
+
+\section{项目}
+\ResumeItem{图书借阅管理系统}[Java·Spring Boot·MySQL][2025.03 -- 2025.06]
+\begin{itemize}
+  \item 独立实现借阅/归还/超期统计 6 个功能模块与 6 张表的数据库设计
+\end{itemize}
+
+\ResumeItem{个人博客系统}[React·FastAPI][2024.11 -- 2025.01]
+\begin{itemize}
+  \item 实现文章发布与评论，自行扩展标签分类与全文搜索
+\end{itemize}
+
+\section{技能}
+\GrayText{Java / Spring Boot / MySQL / Redis / Vue / React / Git}
+
+\end{document}

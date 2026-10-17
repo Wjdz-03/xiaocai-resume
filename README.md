@@ -144,14 +144,18 @@ xiaocai-resume/
 ├── AGENTS.md                  # 本仓库开发规则（辅助 skill 开发）
 ├── contracts/                 # 契约层
 │   ├── profile.schema.json    # profile.yaml 结构定义
-│   ├── output-contract.md     # 输出目录命名、1 页、文件清单
-│   └── latex-rules.md         # 手写 tex 规范
+│   ├── output-contract.md     # 输出目录命名、1 页、文件清单、交付三件套
+│   ├── latex-rules.md         # 手写 tex 规范
+│   ├── intake-playbook.md     # 采料问卷 + 人群 playbook（解决"没东西可写"）
+│   ├── bullet-craft.md        # STAR bullet 工厂 + 动作动词库
+│   └── jd-alignment.md        # JD 关键词对齐 + 覆盖报告
 ├── templates/
 │   ├── resume.cls             # 排版模板（勿改）
-│   ├── skeleton.tex           # 简历骨架范本
+│   ├── skeleton.tex           # 简历骨架范本（经典单栏）
+│   ├── preview/               # 可选模板预览样例（t1-classic / t3-minimal）
 │   └── example.profile.yaml   # 示例素材库（虚构，教学用）
 └── scripts/                   # 确定性原语（agent 只调用）
-    ├── resume.mjs             # 跨平台 Node CLI（check-env / new-output / build / validate / check-profile）
+    ├── resume.mjs             # 跨平台 Node CLI（check-env / new-output / build / validate / preview / check-profile）
     └── check_profile.py       # 校验 profile.yaml（可选，需 pyyaml，经 check-profile 转发）
 ```
 
