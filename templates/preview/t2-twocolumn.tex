@@ -1,0 +1,96 @@
+% !TeX TS-program = xelatex
+% T2 双栏（左栏技能/教育，右栏经历，适合信息分类清晰、条目较多）
+% 编译由 scripts/resume.mjs preview 负责（自动按平台替换字体占位符）
+\documentclass{resume}
+\ResumeName{李 华}
+
+\usepackage{graphicx}
+\usepackage{calc}
+\setCJKmainfont{<CJK_FONT>}
+\setCJKsansfont{<CJK_FONT>}
+\setCJKfamilyfont{hei}[AutoFakeBold=2.5]{<CJK_FONT>}
+\newcommand{\heiti}{\CJKfamily{hei}\bfseries}
+
+% T2 特征：双栏布局。左栏窄（联系/技能/教育），右栏宽（项目/经历）。
+% 中文断行：左栏内容短、右栏 bullet 留短，避免窄栏里长句换行难看。
+
+\newcommand{\LeftColHead}[1]{\vspace{0.4em}\noindent{\heiti #1}\vspace{2pt}\hrule\vspace{-0.2em}}
+
+\begin{document}
+
+% ---- 大标题（姓名 + 求职意向）----
+\begin{center}
+  {\zihao{-2}\heiti 李华}\\[-0.1em]
+  \GrayText{后端开发实习生 | 杭州 | 13912345678 | lihua@example.com}
+\end{center}
+\vspace{0.2em}
+
+\noindent
+\begin{minipage}[t]{0.30\textwidth}
+  \LeftColHead{技能}
+  {\small
+  \textbf{后端}\\
+  Java / Spring Boot\\
+  MySQL / Redis\\[0.3em]
+  \textbf{前端}\\
+  Vue / React\\[0.3em]
+  \textbf{工具}\\
+  Git / Linux
+  \par}
+
+  \LeftColHead{教育}
+  {\small
+  \textbf{某大学}\\
+  软件工程 | 本科\\
+  2022.09 -- 2026.06\\[0.2em]
+  \GrayText{校级一等奖学金\\（2024、2025）}
+  \par}
+
+  \LeftColHead{语言}
+  {\small
+  英语 CET-6\\
+  可读英文技术文档
+  \par}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.66\textwidth}
+  \LeftColHead{项目经历}
+  {\small
+  \textbf{图书借阅管理系统}\\
+  \GrayText{Java · Spring Boot · MySQL | 2025.03 -- 2025.06}
+  \par}
+  \vspace{0.2em}
+  {\small
+  \begin{itemize}
+    \item 独立实现借阅/归还/超期统计 6 个功能模块
+    \item 设计 6 张表的数据库结构，配合 Vue 完成借阅台账页面
+  \end{itemize}
+  \par}
+
+  \vspace{0.3em}
+  {\small
+  \textbf{个人博客系统}\\
+  \GrayText{React · FastAPI | 2024.11 -- 2025.01}
+  \par}
+  \vspace{0.2em}
+  {\small
+  \begin{itemize}
+    \item 实现文章发布与评论功能
+    \item 自行扩展标签分类与全文搜索
+  \end{itemize}
+  \par}
+
+  \LeftColHead{校园经历}
+  {\small
+  \textbf{学生会宣传部 | 部长}\\
+  \GrayText{2023.09 -- 2024.06}
+  \par}
+  \vspace{0.2em}
+  {\small
+  \begin{itemize}
+    \item 组织校级迎新晚会（参与 500+ 人），统筹 8 人宣传组
+  \end{itemize}
+  \par}
+\end{minipage}
+
+\end{document}

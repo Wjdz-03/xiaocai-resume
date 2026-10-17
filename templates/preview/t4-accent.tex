@@ -1,0 +1,51 @@
+% !TeX TS-program = xelatex
+% T4 强调色现代（accent 色标题/技能标签，适合互联网/AI 岗位）
+% 编译由 scripts/resume.mjs preview 负责（自动按平台替换字体占位符）
+\documentclass{resume}
+\ResumeName{李 华}
+
+\usepackage{graphicx}
+\usepackage{xcolor}
+\setCJKmainfont{<CJK_FONT>}
+\setCJKsansfont{<CJK_FONT>}
+\setCJKfamilyfont{hei}[AutoFakeBold=2.5]{<CJK_FONT>}
+\newcommand{\heiti}{\CJKfamily{hei}\bfseries}
+
+% T4 特征：强调色贯穿（章节标题、技能标签、分隔线），打印建议选深色系
+\definecolor{accent}{RGB}{30,90,180}
+
+% 强调色章节标题（自定义横线，用 \rule 保证颜色生效）
+\newcommand{\AccentSection}[1]{\vspace{0.7em}\noindent{\heiti\textcolor{accent}{#1}}\vspace{2pt}\textcolor{accent}{\rule{\linewidth}{1.2pt}}\vspace{-0.2em}}
+
+% 技能标签（强调色圆角框近似：浅底色标签）
+\newcommand{\SkillTag}[1]{\textcolor{accent}{\fbox{\small #1}}}
+
+\begin{document}
+
+% ---- 标题：姓名 + 强调色职位 ----
+\begin{center}
+  {\zihao{-2}\heiti 李华}\\[0.1em]
+  {\textcolor{accent}{\textbf{后端开发实习生}}}\\[0.1em]
+  \GrayText{13912345678 | lihua@example.com | 杭州}
+\end{center}
+
+\AccentSection{技能}
+\SkillTag{Java}\ \SkillTag{Spring Boot}\ \SkillTag{MySQL}\ \SkillTag{Redis}\ \SkillTag{Vue}\ \SkillTag{React}
+
+\AccentSection{项目经历}
+\ResumeItem{图书借阅管理系统}[\textnormal{Java · Spring Boot · MySQL}][2025.03 -- 2025.06]
+\begin{itemize}
+  \item 独立实现借阅/归还/超期统计 6 个功能模块，设计 6 张表的数据库结构
+  \item 用 Spring Boot 构建后端接口，配合 Vue 完成借阅台账页面
+\end{itemize}
+
+\ResumeItem{个人博客系统}[\textnormal{React · FastAPI}][2024.11 -- 2025.01]
+\begin{itemize}
+  \item 实现文章发布与评论功能，自行扩展标签分类与全文搜索
+\end{itemize}
+
+\AccentSection{教育经历}
+\ResumeItem[某大学|本科]{某大学}[\textnormal{软件工程\textbar} 本科][2022.09 -- 2026.06]
+\GrayText{校级一等奖学金（2024、2025）}
+
+\end{document}

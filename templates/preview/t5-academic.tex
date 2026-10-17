@@ -1,0 +1,53 @@
+% !TeX TS-program = xelatex
+% T5 学术风（突出教育/科研/论文，适合考研、留学、科研助理）
+% 编译由 scripts/resume.mjs preview 负责（自动按平台替换字体占位符）
+\documentclass{resume}
+\ResumeName{李 华}
+
+\usepackage{graphicx}
+\setCJKmainfont{<CJK_FONT>}
+\setCJKsansfont{<CJK_FONT>}
+\setCJKfamilyfont{hei}[AutoFakeBold=2.5]{<CJK_FONT>}
+\newcommand{\heiti}{\CJKfamily{hei}\bfseries}
+
+% T5 特征：学术 CV 结构——教育/科研/论文/奖项优先，经验靠后；
+% 无照片、正式标题、强调学术产出（论文/课程/科研项目）
+
+\newcommand{\AcadSection}[1]{\vspace{0.7em}\noindent{\heiti #1}\vspace{2pt}\hrule\vspace{-0.2em}}
+
+\begin{document}
+
+% ---- 正式标题（学术 CV 风格：姓名 + 一行申请信息）----
+\begin{center}
+  {\zihao{-2}\heiti 李 华}\\[0.1em]
+  \GrayText{申请方向：计算机科学与技术（硕士） | 13912345678 | lihua@example.com}
+\end{center}
+
+\AcadSection{教育背景}
+\ResumeItem[某大学|本科]{某大学}[\textnormal{软件工程\textbar} 工学学士][2022.09 -- 2026.06]
+主修课程：数据结构、操作系统、机器学习、数据库系统、计算机网络
+
+\GrayText{GPA 3.7/4.0（专业前 10\%）；校级一等奖学金（2024、2025）}
+
+\AcadSection{科研经历}
+\ResumeItem{基于深度学习的文本分类研究}[本科毕业设计][2025.03 -- 2025.06]
+\begin{itemize}
+  \item 复现 Transformer 编码器结构，在公开数据集上完成文本分类实验
+  \item 用 PyTorch 从零实现注意力机制与训练流程，对比 3 种基线模型效果
+\end{itemize}
+
+\AcadSection{论文与产出}
+\ResumeItem{本科毕业论文}[论文\textbar 约 2 万字][2025.06]
+基于 Transformer 的中文文本分类方法研究（指导教师：某某某，答辩评定：优秀）
+
+\AcadSection{项目经历}
+\ResumeItem{个人博客系统}[自学项目][2024.11 -- 2025.01]
+\begin{itemize}
+  \item 实现文章发布与评论功能（React + FastAPI），自行扩展标签分类与全文搜索
+\end{itemize}
+
+\AcadSection{技能}
+\ResumeItem{研究工具}{Python、PyTorch、pandas、MATLAB（实验数据处理）}
+\ResumeItem{工程技能}{Java、Spring Boot、MySQL、Git}
+
+\end{document}

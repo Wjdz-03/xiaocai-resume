@@ -108,7 +108,10 @@ JD 关键词对齐按 `contracts/jd-alignment.md`：只换叫法不改事实，�
    `contracts/latex-rules.md`）。
    默认用 `skeleton.tex` 的经典单栏；用户想要别的观感时，先跑
    `node <skill>/scripts/resume.mjs preview` 看模板列表、`preview <name>` 编译
-   各模板效果图让用户挑（`t1-classic` 信息密集 / `t3-minimal` 极简留白），
+   各模板效果图让用户挑：
+   `t1-classic` 信息密集单栏（经历多）/ `t2-twocolumn` 双栏（信息分类清晰）/
+   `t3-minimal` 极简留白（经历精炼）/ `t4-accent` 强调色现代（互联网/AI 岗）/
+   `t5-academic` 学术风（考研/留学/科研）。
    选中的模板输出的 `resume.tex` 可直接作为改写起点。
    照片是可选项：国内校招/国企岗位通常带照片，外企或用户要求时不带。
    不要复制整份素材库到输出目录。

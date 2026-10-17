@@ -152,7 +152,7 @@ xiaocai-resume/
 ├── templates/
 │   ├── resume.cls             # 排版模板（勿改）
 │   ├── skeleton.tex           # 简历骨架范本（经典单栏）
-│   ├── preview/               # 可选模板预览样例（t1-classic / t3-minimal）
+│   ├── preview/               # 可选模板预览样例（t1-classic / t2-twocolumn / t3-minimal / t4-accent / t5-academic）
 │   └── example.profile.yaml   # 示例素材库（虚构，教学用）
 └── scripts/                   # 确定性原语（agent 只调用）
     ├── resume.mjs             # 跨平台 Node CLI（check-env / new-output / build / validate / preview / check-profile）
